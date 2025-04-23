@@ -6,7 +6,7 @@
 apiVersion: apps/v1
 kind: DaemonSet
 metadata:
-  name: {{ .Release.Name }}-agent
+  name: {{ include "volcano.agent.fullname" . }}
   namespace: {{ .Release.Namespace }}
 spec:
   selector:
@@ -41,7 +41,7 @@ spec:
       imagePullSecrets:
         - name: {{ .Values.basic.image_pull_secret }}
       {{- end }}
-      serviceAccountName: {{ .Release.Name }}-agent
+      serviceAccountName: {{ include "volcano.agent.fullname" . }}
       hostNetwork: true
       priorityClassName: system-node-critical
       restartPolicy: Always
@@ -186,7 +186,7 @@ kind: ServiceAccount
 metadata:
   labels:
     app: volcano-agent
-  name: {{ .Release.Name }}-agent
+  name: {{ include "volcano.agent.fullname" . }}
   namespace: {{ .Release.Namespace }}
 
 ---
@@ -195,7 +195,7 @@ apiVersion: rbac.authorization.k8s.io/v1
 metadata:
   labels:
     app: volcano-agent
-  name: {{ .Release.Name }}-agent
+  name: {{ include "volcano.agent.fullname" . }}
 rules:
   - apiGroups: [""]
     resources: [ "nodes", "nodes/status" ]
@@ -225,16 +225,16 @@ apiVersion: rbac.authorization.k8s.io/v1
 metadata:
   labels:
     app: volcano-agent
-  name: {{ .Release.Name }}-agent-role
+  name: {{ include "volcano.agent.fullname" . }}-role
 subjects:
   - kind: ServiceAccount
-    name: {{ .Release.Name }}-agent
+    name: {{ include "volcano.agent.fullname" . }}
     namespace: {{ .Release.Namespace }}
   - kind: User
     apiGroup: rbac.authorization.k8s.io
-    name: {{ .Release.Name }}-agent
+    name: {{ include "volcano.agent.fullname" . }}
 roleRef:
   kind: ClusterRole
-  name: {{ .Release.Name }}-agent
+  name: {{ include "volcano.agent.fullname" . }}
   apiGroup: rbac.authorization.k8s.io
 {{- end }}
